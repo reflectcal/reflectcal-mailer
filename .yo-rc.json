@@ -1,0 +1,6 @@
+{
+  "generator-node-babel": {
+    "srcDir": "src",
+    "slugname": "reflectcalMailer"
+  }
+}

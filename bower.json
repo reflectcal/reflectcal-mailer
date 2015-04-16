@@ -1,0 +1,23 @@
+{
+  "name": "reflectcalMailer",
+  "version": "0.0.1",
+  "ignore": [
+    "**/.*",
+    "build",
+    "test",
+    "*.md",
+    "AUTHORS.txt",
+    "Gruntfile.js",
+    "package.json",
+    "bower.json"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "keywords": [
+    "reflectcalMailer",
+    "javascript",
+    "library"
+  ]
+}
