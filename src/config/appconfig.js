@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015. Rflect, Alex K.
+ * Copyright (c) 2015. Reflect, Alex K.
  */
 
 /**
@@ -119,7 +119,7 @@ export const JSON_XSS_PREPENDER = '])}>"';
  * Logger.
  */
 export const log = bunyan.default.createLogger({
-  name: 'reflectevents',
+  name: 'reflectcal-mailer',
   streams: [
     {
       level: 'info',

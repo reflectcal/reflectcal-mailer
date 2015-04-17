@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015. Rflect, Alex K.
+ * Copyright (c) 2015. Reflect, Alex K.
  */
 
 /**
@@ -15,6 +15,6 @@ import { install } from 'source-map-support';
 install();
 
 
-export const db = monk('localhost:27017/' + appConfig.DB_NAME);
+export const db = monk.default('localhost:27017/' + appConfig.DB_NAME);
 
 
