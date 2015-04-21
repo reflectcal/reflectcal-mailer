@@ -37,13 +37,11 @@ function prepareMailOptions(aEventsToSend, aUserName) {
 
 
 export function mail(aUsersToEvents) {
-  return new Promise((resolve, reject) => {
-    Promise.all(
-      aUsersToEvents.map((aEvents, aUserName) => {
-        return sendMailWithPromise(prepareMailOptions(aEvents)).then(aInfo => {
-          console.log('Message sent: ' + aInfo.response);
-        })
+  return Promise.all(
+    aUsersToEvents.map((aEvents, aUserName) => {
+      return sendMailWithPromise(prepareMailOptions(aEvents)).then(aInfo => {
+        console.log('Message sent: ' + aInfo.response);
       })
-    ).then(resolve, reject);
-  })
+    })
+  )
 }
