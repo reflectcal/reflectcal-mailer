@@ -10,6 +10,7 @@
 
 import * as bunyan from 'bunyan';
 import { install } from 'source-map-support';
+import * as fs from 'fs';
 install();
 
 
@@ -144,3 +145,24 @@ export const log = bunyan.default.createLogger({
 });
 
 
+var credsObject = JSON.parse(fs.default.readFileSync('mail-credentials', {
+  encoding: 'utf-8'
+}));
+
+
+/**
+ * Mail options.
+ */
+export const MAIL_OPTIONS = {
+  from: credsObject.username, // sender address
+  to: '', // list of receivers
+  subject: '', // Subject line
+  text: '', // plaintext body
+  html: '' // html body
+};
+
+
+export const MAILER_CREDENTIALS = {
+  user: credsObject.username
+  pass: credsObject.password
+}

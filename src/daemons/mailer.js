@@ -3,7 +3,7 @@
  */
 
 /**
- * @fileoverview Core for mailer daemon.
+ * @fileoverview Mailer daemon.
  * @author alexeykofficial@gmail.com (Alex K.)
  */
 
@@ -12,6 +12,7 @@ import * as appConfig from '../config/appconfig';
 import * as Q from 'q';
 import { db } from '../db/connection.js'
 import { install } from 'source-map-support';
+import { mail } from './mailer-core';
 goog.require('goog.array');
 
 
@@ -81,16 +82,35 @@ function onMinuteCallback(aNowTime) {
             eventStartTime < intervalEnd;
       })
     })
-
-    var groupedByCalendar = goog.array.bucket(upcomingEvents, aEvent =>
+    return upcomingEvents;
+  }).then(aUpcomingEvents => {
+    var aGroupedByCalendar = goog.array.bucket(upcomingEvents, aEvent =>
         aEvent.calendarId);
+  }).then(aGroupedByCalendar => {
+    return new Promise((resolve, reject) => {
 
-    var usersToEvents = new Map();
-    for (let calendarId in groupedByCalendar) {
+      var userNamesPromises = [];
+      var eventGroups = [];
+      for (let calendarId in aGroupedByCalendar) {
+        userNamesPromises.push(getUsersForCalendarIdWithPromise(calendarId));
+        eventGroups.push(aGroupedByCalendar[calendarId]);
+      }
 
-      groupedByCalendar
-    }
-  }, log);
+      var usersToEvents = new Map();
+      Promise.all(userNamesPromises).then(aUserNameGroups => {
+        aUserNameGroups.forEach((aUserNames, aIndex) => {
+          aUserNames.forEach(aUserName => {
+            if (!usersToEvents.has(aUserName)) {
+              usersToEvents.set(aUserName, []);
+            }
+            usersToEvents.get(aUserName).push(...eventGroups[aIndex]);
+          })
+        })
+        resolve(usersToEvents);
+      }, reject);
+    })
+  }).then(mail).then(aResponses => console.log('Mail sent, total: ' +
+      aResponses)).catch(log);
 }
 
 
@@ -131,7 +151,7 @@ function getCloseEventsWithPromise(aLookupObject) {
  * @return {Array<{_1: goog.date.DateTime, _2: Array<rflect.cal.events.Event>}>}
  * Events grouped in form date -> array of events for this date.
  */
-groupEventsByStartDate(aEvents) {
+/*groupEventsByStartDate(aEvents) {
   var groupedEvents = [];
   //Phase 1: group events by start date.
   var eventBuckets = goog.array.bucket(aEvents, aEvent => {
@@ -156,14 +176,14 @@ groupEventsByStartDate(aEvents) {
     var bTime = b._1.getTime();
     return aTime > bTime ? 1 : (aTime < bTime ? -1 : 0);
   });
-}
+}*/
 
 
 /**
  * @param {Array<{_1: goog.date.DateTime, _2: Array<rflect.cal.events.Event>}>}
  * aUpcomingEvents Sequence of date -> events.
  */
-showAlert_(aUpcomingEvents) {
+/*showAlert_(aUpcomingEvents) {
   var alertText = aUpcomingEvents.map(this.upcomingEventsEntryToText).
       filter(alertText => !!alertText).join('\n');
 
@@ -177,13 +197,13 @@ showAlert_(aUpcomingEvents) {
       alert(alertText);
     }, 0);
   }
-}
+}*/
 
 /**
  * @param {{_1: goog.date.DateTime, _2: Array<rflect.cal.events.Event>}} aEntry
  * @return {string} Alert text.
  */
-upcomingEventsEntryToText(aEntry) {
+/*upcomingEventsEntryToText(aEntry) {
   var dateAhead = aEntry._1;
   var events = aEntry._2;
   var firstEvent = events[0];
@@ -205,4 +225,6 @@ upcomingEventsEntryToText(aEntry) {
         new goog.i18n.DateTimeFormat(formatStringTime).format(dateAhead);
   }
   return alertText;
-}
+}*/
+
+
