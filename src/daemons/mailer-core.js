@@ -22,15 +22,6 @@ var transporter = createTransport({
 // NB! No need to recreate the transporter object. You can use
 // the same transporter object for all e-mails
 
-// setup e-mail data with unicode symbols
-var mailOptions = {
-    from: 'Fred Foo ✔ <foo@blurdybloop.com>', // sender address
-    to: 'bar@blurdybloop.com, baz@blurdybloop.com', // list of receivers
-    subject: 'Hello ✔', // Subject line
-    text: 'Hello world ✔', // plaintext body
-    html: '<b>Hello world ✔</b>' // html body
-};
-
 // send mail with defined transport object
 var sendMailWithPromise = Q.default.denodeify.transporter.sendMail;
 
@@ -39,8 +30,8 @@ function prepareMailOptions(aEventsToSend, aUserName) {
   return merge(appConfig.MAIL_OPTIONS, {
     to: aUserName, // list of receivers
     subject: aEventsToSend[0].name, // Subject line
-    text: 'Hello world ✔', // plaintext body
-    html: '<b>Hello world ✔</b>' // html body
+    text: aEventsToSend[0].name, // plaintext body
+    html: aEventsToSend[0].name // html body
   })
 }
 
@@ -51,7 +42,7 @@ export function mail(aUsersToEvents) {
       aUsersToEvents.map((aEvents, aUserName) => {
         return sendMailWithPromise(prepareMailOptions(aEvents)).then(aInfo => {
           console.log('Message sent: ' + aInfo.response);
-        }, console.log)
+        })
       })
     ).then(resolve, reject);
   })
