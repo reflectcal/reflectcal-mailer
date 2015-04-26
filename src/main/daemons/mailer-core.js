@@ -13,6 +13,7 @@ import * as Q from 'q';
 import { objectMerge as merge } from 'object-merge';
 import * as appConfig from '../config/appconfig';
 
+
 // create reusable transporter object using SMTP transport
 var transporter = createTransport({
     service: 'Gmail',
@@ -23,7 +24,7 @@ var transporter = createTransport({
 // the same transporter object for all e-mails
 
 // send mail with defined transport object
-var sendMailWithPromise = Q.default.denodeify.transporter.sendMail;
+var sendMailWithPromise = Q.default.denodeify(transporter.sendMail);
 
 
 function prepareMailOptions(aEventsToSend, aUserName) {

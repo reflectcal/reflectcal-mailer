@@ -13,6 +13,7 @@ import * as Q from 'q';
 import { db } from '../db/connection.js'
 import { install } from 'source-map-support';
 import { mail } from './mailer-core';
+require('google-closure-library/closure/goog/bootstrap/nodejs');
 goog.require('goog.array');
 
 
@@ -57,7 +58,7 @@ function notificationLoopCallback() {
   var nowTime = now.getTime();
 
   //Allow body to run every minute.
-  if (nowTime != intervalStart) {
+  if (nowTime != lastCheckedTime) {
     lastCheckedTime = nowTime;
 
     onMinuteCallback(nowTime);
@@ -66,55 +67,62 @@ function notificationLoopCallback() {
 }
 
 
-function onMinuteCallback(aNowTime) {
-  db.get('events')
-
-  getCloseEventsWithPromise({}).then(aEvents => {
-    var upcomingEvents = aEvents.filter(aEvent => {
-      var eventStartTime = aEvent.start;
-      return (aEvent.alerts || []).some(aAlert => {
-        var intervalStart = aNowTime + aAlert.interval;
-        var intervalEnd = intervalStart + MINUTE;
-        console.log('Requesting interval from: ',
-            new Date(intervalStart).toISOString(), ' to: ',
-            new Date(intervalEnd).toISOString())
-        return 3 == aAlert.type && eventStartTime >= intervalStart &&
-            eventStartTime < intervalEnd;
-      })
+export var filterUpcomingEvents = (aNowTime, aEvents) => {
+  var upcomingEvents = aEvents.filter(aEvent => {
+    var eventStartTime = aEvent.start;
+    return (aEvent.alerts || []).some(aAlert => {
+      var intervalStart = aNowTime + aAlert.interval;
+      var intervalEnd = intervalStart + MINUTE;
+      console.log('Requesting interval from: ',
+          new Date(intervalStart).toISOString(), ' to: ',
+          new Date(intervalEnd).toISOString())
+      return 3 == aAlert.type && eventStartTime >= intervalStart &&
+          eventStartTime < intervalEnd;
     })
-    return upcomingEvents;
-  }).then(aUpcomingEvents => {
-    var aGroupedByCalendar = goog.array.bucket(upcomingEvents, aEvent =>
-        aEvent.calendarId);
-  }).then(aGroupedByCalendar => {
-    return new Promise((resolve, reject) => {
-
-      var userNamesPromises = [];
-      var eventGroups = [];
-      for (let calendarId in aGroupedByCalendar) {
-        userNamesPromises.push(getUsersForCalendarIdWithPromise(calendarId));
-        eventGroups.push(aGroupedByCalendar[calendarId]);
-      }
-
-      var usersToEvents = new Map();
-      Promise.all(userNamesPromises).then(aUserNameGroups => {
-        aUserNameGroups.forEach((aUserNames, aIndex) => {
-          aUserNames.forEach(aUserName => {
-            if (!usersToEvents.has(aUserName)) {
-              usersToEvents.set(aUserName, []);
-            }
-            usersToEvents.get(aUserName).push(...eventGroups[aIndex]);
-          })
-        })
-        resolve(usersToEvents);
-      }, reject);
-    })
-  }).then(mail).then(aResponses => console.log('Mail sent, total: ' +
-      aResponses)).catch(log);
+  })
+  return upcomingEvents;
 }
 
 
-function getUsersForCalendarIdWithPromise(aCalendarId) {
+export var groupByUserName = aGroupedByCalendar => {
+  return new Promise((resolve, reject) => {
+
+    var userNamesPromises = [];
+    var eventGroups = [];
+    for (let calendarId in aGroupedByCalendar) {
+     userNamesPromises.push(getUsersForCalendarIdWithPromise(calendarId));
+     eventGroups.push(aGroupedByCalendar[calendarId]);
+    }
+
+    var usersToEvents = new Map();
+    Promise.all(userNamesPromises).then(aUserNameGroups => {
+     aUserNameGroups.forEach((aUserNames, aIndex) => {
+       aUserNames.forEach(aUserName => {
+         if (!usersToEvents.has(aUserName)) {
+           usersToEvents.set(aUserName, []);
+         }
+         usersToEvents.get(aUserName).push(...eventGroups[aIndex]);
+       })
+     })
+     resolve(usersToEvents);
+    }, reject);
+  })
+}
+
+
+function onMinuteCallback(aNowTime) {
+  db.get('events')
+
+  getCloseEventsWithPromise({}).then(filterUpcomingEvents.bind(this, aNowTime)).
+      then(aUpcomingEvents => {
+    var aGroupedByCalendar = goog.array.bucket(upcomingEvents, aEvent =>
+        aEvent.calendarId);
+  }).then(groupByUserName).then(mail).then(aResponses =>
+      console.log('Mail sent, total: ' + aResponses)).catch(log);
+}
+
+
+export function getUsersForCalendarIdWithPromise(aCalendarId) {
   return new Promise(function(resolve, reject) {
     var collection = db.get('calendars');
     var findWithPromise = Q.default.denodeify(collection.find.bind(collection));
@@ -137,7 +145,7 @@ function getUsersForCalendarIdWithPromise(aCalendarId) {
 }
 
 
-function getCloseEventsWithPromise(aLookupObject) {
+export function getCloseEventsWithPromise(aLookupObject) {
   return new Promise(function(resolve, reject) {
     var collection = db.get('events');
     var findWithPromise = Q.default.denodeify(collection.find.bind(collection));

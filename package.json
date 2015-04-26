@@ -1,5 +1,6 @@
 {
   "name": "reflectcal-mailer",
+  "repository": "https://github.com/alexeykomov/reflectcal-mailer",
   "version": "0.0.1",
   "description": "mail daemon for web-calendar",
   "main": "js/app.js",
@@ -8,7 +9,8 @@
   },
   "private": false,
   "scripts": {
-    "start": "node js/app.js"
+    "start": "node js/main/app.js",
+    "test": "gulp babel; jasmine"
   },
   "keywords": [
     "daemon",
@@ -23,6 +25,8 @@
     "gulp": "^3.8.11",
     "gulp-babel": "^5.1.0",
     "gulp-sourcemaps": "^1.5.1",
+    "jasmine": "^2.2.1",
+    "jasmine-core": "^2.2.0",
     "source-map-support": "^0.2.10"
   },
   "dependencies": {

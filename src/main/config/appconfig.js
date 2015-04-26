@@ -145,9 +145,7 @@ export const log = bunyan.default.createLogger({
 });
 
 
-var credsObject = JSON.parse(fs.default.readFileSync('mail-credentials', {
-  encoding: 'utf-8'
-}));
+var credsObject = {};
 
 
 /**
@@ -163,6 +161,6 @@ export const MAIL_OPTIONS = {
 
 
 export const MAILER_CREDENTIALS = {
-  user: credsObject.username
+  user: credsObject.username,
   pass: credsObject.password
 }
