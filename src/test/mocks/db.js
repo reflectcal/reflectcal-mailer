@@ -8,25 +8,25 @@
  */
 
 
-import { filterUpcomingEvents } from '../main/daemons/mailer';
-import { objectMerge as merge } from 'object-merge';
+import * as merge from 'object-merge';
 import { install } from 'source-map-support';
 install();
 
 
-const ALERT_INTERVAL = 900000;
-const EVENT_DURATION = 1000 * 60 * 60;
-const MINUTE = 1000 * 60;
+export const ALERT_INTERVAL = 900000;
+export const EVENT_DURATION = 1000 * 60 * 60;
+export const MINUTE = 1000 * 60;
+export const TYPE_MAIL = 3;
 
 
 var alertProto = {
-  type : 0,
+  type : 3,
   interval : ALERT_INTERVAL
 }
 
 
-function createAlert(aType) = {
-  return merge(alertProto, {
+function createAlert(aType) {
+  return merge.default(alertProto, {
     type: aType
   });
 }
@@ -34,8 +34,7 @@ function createAlert(aType) = {
 
 var eventProto = {
   _id : '',
-  alerts : [
-  ],
+  alerts : [],
   calendarId : '',
   allDay : false,
   description : '',
@@ -45,27 +44,67 @@ var eventProto = {
 }
 
 
-function createUpcomingEvent(aType) = {
-  var event = merge(eventProto, {
-    start : ALERT_INTERVAL,
-    end : ALERT_INTERVAL + EVENT_DURATION,
+export function createUpcomingEvent() {
+  var start = ALERT_INTERVAL;
+  var event = merge.default(eventProto, {
+    start: start,
+    end: start + EVENT_DURATION,
   });
+  event._id = goog.getUid(event);
+  event.alerts.push(createAlert(TYPE_MAIL));
+  return event;
 }
 
 
-function createUpcomingOnEdgeEvent(aType) = {
-  var event = merge(eventProto, {
-    start : ALERT_INTERVAL + (MINUTE - 1),
-    end : ALERT_INTERVAL + (MINUTE - 1) + EVENT_DURATION,
+export function createUpcomingOnEdgeEvent() {
+  var start = ALERT_INTERVAL + (MINUTE - 1);
+  var event = merge.default(eventProto, {
+    start: start,
+    end: start + EVENT_DURATION,
   });
+  event._id = goog.getUid(event);
+  event.alerts.push(createAlert(TYPE_MAIL));
+  return event;
 }
 
 
-function createNotUpcomingEvent(aType) = {
-  var event = merge(eventProto, {
-    start : ALERT_INTERVAL + MINUTE,
-    end : ALERT_INTERVAL + MINUTE + EVENT_DURATION,
+export function createNotUpcomingEvent() {
+  var start = ALERT_INTERVAL + MINUTE;
+  var event = merge.default(eventProto, {
+    start : start,
+    end : start + EVENT_DURATION,
   });
+  event._id = goog.getUid(event);
+  event.alerts.push(createAlert(TYPE_MAIL));
+  return event;
+}
+
+
+export function createUpcomingEventOfNonMailType() {
+  var start = ALERT_INTERVAL;
+  var event = merge.default(eventProto, {
+    start: start,
+    end: start + EVENT_DURATION,
+  });
+  event._id = goog.getUid(event);
+  event.alerts.push(createAlert(0));
+  return event;
+}
+
+
+export function createEventForCalendar(aCalendarId) {
+  var event = createUpcomingEvent();
+  event.calendarId = aCalendarId;
+  return event;
+}
+
+export function createEventSeqForCalendar(aCalendarId) {
+  var events = [];
+  var seqLength = Math.floor(Math.random() * 10);
+  for (let counter = 0; counter < seqLength; counter++) {
+    events.push(createEventForCalendar(aCalendarId));
+  }
+  return events;
 }
 
 
@@ -83,5 +122,13 @@ export var findWithPromiseErrorMock = () => {
     setTimeout(() => {
       reject();
     }, 0)
+  })
+}
+
+
+export function getUsersForCalendarIdWithPromiseMock(aCalendarIdToUsersMap,
+    aCalendarId) {
+  return new Promise((resolve, reject) => {
+    resolve(aCalendarIdToUsersMap.get(aCalendarId) || []);
   })
 }

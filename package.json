@@ -3,14 +3,14 @@
   "repository": "https://github.com/alexeykomov/reflectcal-mailer",
   "version": "0.0.1",
   "description": "mail daemon for web-calendar",
-  "main": "js/app.js",
+  "main": "js/main/app.js",
   "directories": {
     "doc": "doc"
   },
   "private": false,
   "scripts": {
-    "start": "node js/main/app.js",
-    "test": "gulp babel; jasmine"
+    "start": "gulp babel & node js/main/app.js",
+    "test": "gulp babel & jasmine"
   },
   "keywords": [
     "daemon",

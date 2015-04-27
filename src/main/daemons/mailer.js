@@ -84,27 +84,28 @@ export var filterUpcomingEvents = (aNowTime, aEvents) => {
 }
 
 
-export var groupByUserName = aGroupedByCalendar => {
+export var groupByUserName = (aGetUsersForCalendarIdWithPromise,
+    aGroupedByCalendar) => {
   return new Promise((resolve, reject) => {
 
     var userNamesPromises = [];
     var eventGroups = [];
     for (let calendarId in aGroupedByCalendar) {
-     userNamesPromises.push(getUsersForCalendarIdWithPromise(calendarId));
-     eventGroups.push(aGroupedByCalendar[calendarId]);
+      userNamesPromises.push(aGetUsersForCalendarIdWithPromise(calendarId));
+      eventGroups.push(aGroupedByCalendar[calendarId]);
     }
 
     var usersToEvents = new Map();
     Promise.all(userNamesPromises).then(aUserNameGroups => {
-     aUserNameGroups.forEach((aUserNames, aIndex) => {
-       aUserNames.forEach(aUserName => {
-         if (!usersToEvents.has(aUserName)) {
-           usersToEvents.set(aUserName, []);
-         }
-         usersToEvents.get(aUserName).push(...eventGroups[aIndex]);
-       })
-     })
-     resolve(usersToEvents);
+      aUserNameGroups.forEach((aUserNames, aIndex) => {
+        aUserNames.forEach(aUserName => {
+          if (!usersToEvents.has(aUserName)) {
+            usersToEvents.set(aUserName, []);
+          }
+          usersToEvents.get(aUserName).push(...eventGroups[aIndex]);
+        })
+      })
+      resolve(usersToEvents);
     }, reject);
   })
 }
@@ -117,7 +118,8 @@ function onMinuteCallback(aNowTime) {
       then(aUpcomingEvents => {
     var aGroupedByCalendar = goog.array.bucket(upcomingEvents, aEvent =>
         aEvent.calendarId);
-  }).then(groupByUserName).then(mail).then(aResponses =>
+  }).then(groupByUserName.bind(this, getUsersForCalendarIdWithPromise)).
+      then(mail).then(aResponses =>
       console.log('Mail sent, total: ' + aResponses)).catch(log);
 }
 
