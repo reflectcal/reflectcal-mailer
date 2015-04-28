@@ -115,13 +115,6 @@ describe('A groupByUserName', () => {
     })
   });
 
-  it('should produce empty map on empty input', done => {
-    groupByUserNameWithBoundDb({}).then(aUsersToEvents => {
-      expect(aUsersToEvents.size).toBe(0);
-      done();
-    })
-  });
-
   var groupByUserNameWithBoundErrorDb = groupByUserName.bind(this,
       db.getUsersForCalendarIdWithPromiseMockError);
 

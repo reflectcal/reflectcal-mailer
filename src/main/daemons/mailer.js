@@ -84,6 +84,24 @@ export var filterUpcomingEvents = (aNowTime, aEvents) => {
 }
 
 
+function onMinuteCallback(aNowTime) {
+  db.get('events')
+
+  var getUsersForCalendarIdWithPromiseWithBoundDb =
+      getUsersForCalendarIdWithPromise.bind(this, getCalendarsWithPromise);
+
+  getCloseEventsWithPromise({}).
+      then(filterUpcomingEvents.bind(this, aNowTime)).
+      then(aUpcomingEvents => goog.array.bucket(aUpcomingEvents, aEvent =>
+          aEvent.calendarId)).
+      then(groupByUserName.bind(this,
+          getUsersForCalendarIdWithPromiseWithBoundDb)).
+      then(mail).
+      then(aResponses => console.log('Mail sent, total: ' + aResponses)).
+      catch(log);
+}
+
+
 export var groupByUserName = (aGetUsersForCalendarIdWithPromise,
     aGroupedByCalendar) => {
   return new Promise((resolve, reject) => {
@@ -112,24 +130,6 @@ export var groupByUserName = (aGetUsersForCalendarIdWithPromise,
       resolve(usersToEvents);
     }
   })
-}
-
-
-function onMinuteCallback(aNowTime) {
-  db.get('events')
-
-  var getUsersForCalendarIdWithPromiseWithBoundDb =
-      getUsersForCalendarIdWithPromise.bind(this, getCalendarsWithPromise);
-
-  getCloseEventsWithPromise({}).
-      then(filterUpcomingEvents.bind(this, aNowTime)).
-      then(aUpcomingEvents => goog.array.bucket(aUpcomingEvents, aEvent =>
-          aEvent.calendarId)).
-      then(groupByUserName.bind(this,
-          getUsersForCalendarIdWithPromiseWithBoundDb)).
-      then(mail).
-      then(aResponses => console.log('Mail sent, total: ' + aResponses)).
-      catch(log);
 }
 
 
