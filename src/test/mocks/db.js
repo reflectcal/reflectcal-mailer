@@ -44,6 +44,25 @@ var eventProto = {
 }
 
 
+var calendarProto = {
+  name: '',
+  visible: true,
+  readOnly: false,
+  colorCodeId: 2,
+  own: true,
+  owner: '',
+  viewers: [],
+  editors: [],
+  _id: ''
+}
+
+
+export function createCalendar(aCalendar) {
+  var calendar = merge.default(calendarProto, aCalendar);
+  return calendar;
+}
+
+
 export function createUpcomingEvent() {
   var start = ALERT_INTERVAL;
   var event = merge.default(eventProto, {
@@ -98,6 +117,7 @@ export function createEventForCalendar(aCalendarId) {
   return event;
 }
 
+
 export function createEventSeqForCalendar(aCalendarId) {
   var events = [];
   var seqLength = Math.floor(Math.random() * 10);
@@ -117,18 +137,22 @@ export var findWithPromiseMock = () => {
 }
 
 
-export var findWithPromiseErrorMock = () => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject();
-    }, 0)
-  })
+export function findWithPromiseErrorMock() {
+  return new Promise.reject();
 }
 
 
 export function getUsersForCalendarIdWithPromiseMock(aCalendarIdToUsersMap,
     aCalendarId) {
-  return new Promise((resolve, reject) => {
-    resolve(aCalendarIdToUsersMap.get(aCalendarId) || []);
-  })
+  return Promise.resolve(aCalendarIdToUsersMap.get(aCalendarId) || []);
+}
+
+
+export function getUsersForCalendarIdWithPromiseMockError(aCalendarId) {
+  return new Promise.reject();
+}
+
+
+export function getCalendarsWithPromiseMock(aCalendarIdToCalendarMap, aCalendarId) {
+  return Promise.resolve(aCalendarIdToCalendarMap.get(aCalendarId) || []);
 }

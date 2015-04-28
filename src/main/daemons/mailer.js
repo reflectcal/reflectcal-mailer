@@ -87,26 +87,30 @@ export var filterUpcomingEvents = (aNowTime, aEvents) => {
 export var groupByUserName = (aGetUsersForCalendarIdWithPromise,
     aGroupedByCalendar) => {
   return new Promise((resolve, reject) => {
-
     var userNamesPromises = [];
     var eventGroups = [];
+    var usersToEvents = new Map();
+
     for (let calendarId in aGroupedByCalendar) {
       userNamesPromises.push(aGetUsersForCalendarIdWithPromise(calendarId));
       eventGroups.push(aGroupedByCalendar[calendarId]);
     }
 
-    var usersToEvents = new Map();
-    Promise.all(userNamesPromises).then(aUserNameGroups => {
-      aUserNameGroups.forEach((aUserNames, aIndex) => {
-        aUserNames.forEach(aUserName => {
-          if (!usersToEvents.has(aUserName)) {
-            usersToEvents.set(aUserName, []);
-          }
-          usersToEvents.get(aUserName).push(...eventGroups[aIndex]);
+    if (userNamesPromises.length) {
+      Promise.all(userNamesPromises).then(aUserNameGroups => {
+        aUserNameGroups.forEach((aUserNames, aIndex) => {
+          aUserNames.forEach(aUserName => {
+            if (!usersToEvents.has(aUserName)) {
+              usersToEvents.set(aUserName, []);
+            }
+            usersToEvents.get(aUserName).push(...eventGroups[aIndex]);
+          })
         })
-      })
+        resolve(usersToEvents);
+      }).catch(reject);
+    } else {
       resolve(usersToEvents);
-    }, reject);
+    }
   })
 }
 
@@ -114,21 +118,32 @@ export var groupByUserName = (aGetUsersForCalendarIdWithPromise,
 function onMinuteCallback(aNowTime) {
   db.get('events')
 
-  getCloseEventsWithPromise({}).then(filterUpcomingEvents.bind(this, aNowTime)).
-      then(aUpcomingEvents => {
-    var aGroupedByCalendar = goog.array.bucket(upcomingEvents, aEvent =>
-        aEvent.calendarId);
-  }).then(groupByUserName.bind(this, getUsersForCalendarIdWithPromise)).
-      then(mail).then(aResponses =>
-      console.log('Mail sent, total: ' + aResponses)).catch(log);
+  var getUsersForCalendarIdWithPromiseWithBoundDb =
+      getUsersForCalendarIdWithPromise.bind(this, getCalendarsWithPromise);
+
+  getCloseEventsWithPromise({}).
+      then(filterUpcomingEvents.bind(this, aNowTime)).
+      then(aUpcomingEvents => goog.array.bucket(aUpcomingEvents, aEvent =>
+          aEvent.calendarId)).
+      then(groupByUserName.bind(this,
+          getUsersForCalendarIdWithPromiseWithBoundDb)).
+      then(mail).
+      then(aResponses => console.log('Mail sent, total: ' + aResponses)).
+      catch(log);
 }
 
 
-export function getUsersForCalendarIdWithPromise(aCalendarId) {
+function getCalendarsWithPromise(aCalendarId) {
+  var findWithPromise = Q.default.denodeify(collection.find.bind(collection));
+  return findWithPromise({_id: aCalendarId}, {});
+}
+
+
+export function getUsersForCalendarIdWithPromise(aGetCalendarsWithPromise,
+    aCalendarId) {
   return new Promise(function(resolve, reject) {
     var collection = db.get('calendars');
-    var findWithPromise = Q.default.denodeify(collection.find.bind(collection));
-    findWithPromise({_id: aCalendarId}, {}).then(aCalendars => {
+    aGetCalendarsWithPromise(aCalendarId).then(aCalendars => {
       var alreadyAdded = new Set();
       var userNames = [];
       aCalendars.forEach(aCalendar => {
