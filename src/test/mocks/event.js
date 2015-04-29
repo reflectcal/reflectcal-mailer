@@ -3,25 +3,20 @@
  */
 
 /**
- * @fileoverview Mailer test suite.
+ * @fileoverview Event mocks.
  * @author alexeykofficial@gmail.com (Alex K.)
  */
 
 
 import * as merge from 'object-merge';
+import * as constants from './constants';
 import { install } from 'source-map-support';
 install();
 
 
-export const ALERT_INTERVAL = 900000;
-export const EVENT_DURATION = 1000 * 60 * 60;
-export const MINUTE = 1000 * 60;
-export const TYPE_MAIL = 3;
-
-
 var alertProto = {
   type : 3,
-  interval : ALERT_INTERVAL
+  interval : constants.ALERT_INTERVAL
 }
 
 
@@ -43,67 +38,47 @@ var eventProto = {
   start : 0
 }
 
-
-var calendarProto = {
-  name: '',
-  visible: true,
-  readOnly: false,
-  colorCodeId: 2,
-  own: true,
-  owner: '',
-  viewers: [],
-  editors: [],
-  _id: ''
-}
-
-
-export function createCalendar(aCalendar) {
-  var calendar = merge.default(calendarProto, aCalendar);
-  return calendar;
-}
-
-
 export function createUpcomingEvent() {
-  var start = ALERT_INTERVAL;
+  var start = constants.ALERT_INTERVAL;
   var event = merge.default(eventProto, {
     start: start,
-    end: start + EVENT_DURATION,
+    end: start + constants.EVENT_DURATION,
   });
   event._id = goog.getUid(event);
-  event.alerts.push(createAlert(TYPE_MAIL));
+  event.alerts.push(createAlert(constants.TYPE_MAIL));
   return event;
 }
 
 
 export function createUpcomingOnEdgeEvent() {
-  var start = ALERT_INTERVAL + (MINUTE - 1);
+  var start = constants.ALERT_INTERVAL + (constants.MINUTE - 1);
   var event = merge.default(eventProto, {
     start: start,
-    end: start + EVENT_DURATION,
+    end: start + constants.EVENT_DURATION,
   });
   event._id = goog.getUid(event);
-  event.alerts.push(createAlert(TYPE_MAIL));
+  event.alerts.push(createAlert(constants.TYPE_MAIL));
   return event;
 }
 
 
 export function createNotUpcomingEvent() {
-  var start = ALERT_INTERVAL + MINUTE;
+  var start = constants.ALERT_INTERVAL + constants.MINUTE;
   var event = merge.default(eventProto, {
     start : start,
-    end : start + EVENT_DURATION,
+    end : start + constants.EVENT_DURATION,
   });
   event._id = goog.getUid(event);
-  event.alerts.push(createAlert(TYPE_MAIL));
+  event.alerts.push(createAlert(constants.TYPE_MAIL));
   return event;
 }
 
 
 export function createUpcomingEventOfNonMailType() {
-  var start = ALERT_INTERVAL;
+  var start = constants.ALERT_INTERVAL;
   var event = merge.default(eventProto, {
     start: start,
-    end: start + EVENT_DURATION,
+    end: start + constants.EVENT_DURATION,
   });
   event._id = goog.getUid(event);
   event.alerts.push(createAlert(0));

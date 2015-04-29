@@ -15,6 +15,8 @@ import {
 } from './../../main/daemons/mailer';
 import { install } from 'source-map-support';
 import * as db from './../mocks/db';
+import * as calMock from './../mocks/calendar';
+import * as eventMock from './../mocks/event';
 install();
 goog.require('goog.array');
 
@@ -24,10 +26,10 @@ describe('A filterUpcomingEvents', () => {
     expect(filterUpcomingEvents(0, [])).toEqual([]);
   });
 
-  var upcomingEvent = db.createUpcomingEvent();
-  var upcomingOnEdgeEvent = db.createUpcomingOnEdgeEvent();
-  var notUpcomingEvent = db.createNotUpcomingEvent();
-  var upcomingEventOfNonMailType = db.createUpcomingEventOfNonMailType();
+  var upcomingEvent = eventMock.createUpcomingEvent();
+  var upcomingOnEdgeEvent = eventMock.createUpcomingOnEdgeEvent();
+  var notUpcomingEvent = eventMock.createNotUpcomingEvent();
+  var upcomingEventOfNonMailType = eventMock.createUpcomingEventOfNonMailType();
   var list = [];
   list.push(upcomingEvent);
   list.push(upcomingOnEdgeEvent);
@@ -55,9 +57,9 @@ describe('A groupByUserName', () => {
   calendarIdToUsers.set('B', [USER1, USER2]);
   calendarIdToUsers.set('C', [USER3]);
 
-  var events = db.createEventSeqForCalendar('A').
-      concat(db.createEventSeqForCalendar('B')).
-      concat(db.createEventSeqForCalendar('C'));
+  var events = eventMock.createEventSeqForCalendar('A').
+      concat(eventMock.createEventSeqForCalendar('B')).
+      concat(eventMock.createEventSeqForCalendar('C'));
   var eventsGroupedByCalendar = goog.array.bucket(events, aEvent =>
       aEvent.calendarId);
 
@@ -135,35 +137,35 @@ describe('A getUsersForCalendarIdWithPromise', () => {
   const USER4 = 'd1@d.com';
   const USER5 = 'e1@e.com';
 
-  var calendarWithoutViewersAndEditors = db.createCalendar({
+  var calendarWithoutViewersAndEditors = calMock.createCalendar({
     _id: 'A',
     owner: USER1
   });
   delete calendarWithoutViewersAndEditors.viewers;
   delete calendarWithoutViewersAndEditors.editors;
 
-  var calendarWithViewersAndEditors = db.createCalendar({
+  var calendarWithViewersAndEditors = calMock.createCalendar({
     _id: 'B',
     owner: USER1,
     viewers: [USER2, USER3],
     editors: [USER4, USER5]
   });
 
-  var calendarWithoutEditors = db.createCalendar({
+  var calendarWithoutEditors = calMock.createCalendar({
     _id: 'C',
     owner: USER1,
     viewers: [USER2, USER3]
   });
   delete calendarWithoutViewersAndEditors.editors;
 
-  var calendarWithoutViewers = db.createCalendar({
+  var calendarWithoutViewers = calMock.createCalendar({
     _id: 'D',
     owner: USER1,
     editors: [USER2, USER3]
   });
   delete calendarWithoutViewersAndEditors.viewers;
 
-  var calendarWithEmptyViewersAndEditors = db.createCalendar({
+  var calendarWithEmptyViewersAndEditors = calMock.createCalendar({
     _id: 'E',
     owner: USER1,
     viewers: [],
