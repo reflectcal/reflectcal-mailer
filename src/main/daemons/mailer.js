@@ -57,8 +57,10 @@ function notificationLoopCallback() {
 
   var nowTime = now.getTime();
 
+
   //Allow body to run every minute.
   if (nowTime != lastCheckedTime) {
+    console.log('Current moment: ', new Date(nowTime).toISOString());
     lastCheckedTime = nowTime;
 
     onMinuteCallback(nowTime);
@@ -73,20 +75,28 @@ export var filterUpcomingEvents = (aNowTime, aEvents) => {
     return (aEvent.alerts || []).some(aAlert => {
       var intervalStart = aNowTime + aAlert.interval;
       var intervalEnd = intervalStart + MINUTE;
-      console.log('Requesting interval from: ',
-          new Date(intervalStart).toISOString(), ' to: ',
-          new Date(intervalEnd).toISOString())
       return 3 == aAlert.type && eventStartTime >= intervalStart &&
           eventStartTime < intervalEnd;
     })
   })
+
+  upcomingEvents.forEach(aEvent => {
+    (aEvent.alerts || []).filter(aAlert => 3 == aAlert.type).forEach(aAlert => {
+      var intervalStart = aNowTime + aAlert.interval;
+      var intervalEnd = intervalStart + MINUTE;
+      console.log('Will notify about event ', aEvent.name,
+          ' which starts somewhere between ',
+          new Date(intervalStart).toISOString(), ' and ',
+          new Date(intervalEnd).toISOString());
+
+    })
+  });
+
   return upcomingEvents;
 }
 
 
 function onMinuteCallback(aNowTime) {
-  db.get('events')
-
   var getUsersForCalendarIdWithPromiseWithBoundDb =
       getUsersForCalendarIdWithPromise.bind(this, getCalendarsWithPromise);
 
@@ -97,8 +107,11 @@ function onMinuteCallback(aNowTime) {
       then(groupByUserName.bind(this,
           getUsersForCalendarIdWithPromiseWithBoundDb)).
       then(mail).
-      then(aResponses => console.log('Mail sent, total: ' + aResponses)).
-      catch(log);
+      then(aResponses => console.log('Mail sent, total: ' + aResponses.length)).
+      catch(aError => {
+        console.log(aError, aError.stack);
+        log(aError, aError.stack);
+      });
 }
 
 
@@ -108,7 +121,7 @@ export var groupByUserName = (aGetUsersForCalendarIdWithPromise,
     var userNamesPromises = [];
     var eventGroups = [];
     var usersToEvents = new Map();
-
+    console.log('aGroupedByCalendar: ', aGroupedByCalendar);
     for (let calendarId in aGroupedByCalendar) {
       userNamesPromises.push(aGetUsersForCalendarIdWithPromise(calendarId));
       eventGroups.push(aGroupedByCalendar[calendarId]);
@@ -125,7 +138,7 @@ export var groupByUserName = (aGetUsersForCalendarIdWithPromise,
           })
         })
         resolve(usersToEvents);
-      }).catch(reject);
+      }, reject);
     } else {
       resolve(usersToEvents);
     }
@@ -134,6 +147,7 @@ export var groupByUserName = (aGetUsersForCalendarIdWithPromise,
 
 
 function getCalendarsWithPromise(aCalendarId) {
+  var collection = db.get('calendars');
   var findWithPromise = Q.default.denodeify(collection.find.bind(collection));
   return findWithPromise({_id: aCalendarId}, {});
 }
@@ -142,7 +156,6 @@ function getCalendarsWithPromise(aCalendarId) {
 export function getUsersForCalendarIdWithPromise(aGetCalendarsWithPromise,
     aCalendarId) {
   return new Promise(function(resolve, reject) {
-    var collection = db.get('calendars');
     aGetCalendarsWithPromise(aCalendarId).then(aCalendars => {
       var alreadyAdded = new Set();
       var userNames = [];

@@ -15,6 +15,7 @@ import { install } from 'source-map-support';
 install();
 
 
-export const db = monk.default('localhost:27017/' + appConfig.DB_NAME);
+export const db = monk.default(appConfig.DB_SERVER + ':' + appConfig.DB_PORT +
+    '/' + appConfig.DB_NAME);
 
 

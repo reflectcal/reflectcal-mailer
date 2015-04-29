@@ -10,8 +10,11 @@
 
 import { createTransport } from 'nodemailer';
 import * as Q from 'q';
-import { objectMerge as merge } from 'object-merge';
-import * as appConfig from '../config/appconfig';
+import * as merge from 'object-merge';
+import * as appConfig from './../config/appconfig';
+require('google-closure-library/closure/goog/bootstrap/nodejs');
+goog.require('goog.i18n.DateTimeSymbols');
+goog.require('goog.i18n.DateTimeFormat');
 
 
 // create reusable transporter object using SMTP transport
@@ -24,25 +27,46 @@ var transporter = createTransport({
 // the same transporter object for all e-mails
 
 // send mail with defined transport object
-var sendMailWithPromise = Q.default.denodeify(transporter.sendMail);
+var sendMailWithPromise = Q.default.denodeify(transporter.sendMail.bind(
+    transporter));
 
 
 function prepareMailOptions(aEventsToSend, aUserName) {
-  return merge(appConfig.MAIL_OPTIONS, {
-    to: aUserName, // list of receivers
-    subject: aEventsToSend[0].name, // Subject line
-    text: aEventsToSend[0].name, // plaintext body
-    html: aEventsToSend[0].name // html body
+  var event = aEventsToSend[0];
+  var formatStringDate = goog.i18n.DateTimeSymbols.DATEFORMATS[3].
+      replace(/y+/, 'yyyy');
+  var formatStringTime = goog.i18n.DateTimeSymbols.TIMEFORMATS[3];
+
+  var message = (event.name || '(Untitled)') + ' starts at ' +
+      new goog.i18n.DateTimeFormat(formatStringDate).format(
+      new Date(event.start)) +
+      ' ' +
+      new goog.i18n.DateTimeFormat(formatStringTime).format(
+      new Date(event.start));
+
+  return merge.default(appConfig.MAIL_OPTIONS, {
+    to: aUserName,
+    subject: message,
+    text: message,
+    html: message
   })
 }
 
 
 export function mail(aUsersToEvents) {
-  return Promise.all(
-    aUsersToEvents.map((aEvents, aUserName) => {
-      return sendMailWithPromise(prepareMailOptions(aEvents)).then(aInfo => {
+  aUsersToEvents.forEach((aEvents, aUserName) => {
+    console.log('User: ', aUserName);
+    console.log('Events: ', aEvents);
+  });
+
+  var usersToEventsPromises = [];
+  aUsersToEvents.forEach((aEvents, aUserName) => {
+    usersToEventsPromises.push(
+      sendMailWithPromise(prepareMailOptions(aEvents, aUserName)).
+      then(aInfo => {
         console.log('Message sent: ' + aInfo.response);
       })
-    })
-  )
+    )
+  });
+  return Promise.all(usersToEventsPromises);
 }

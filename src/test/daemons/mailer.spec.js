@@ -123,7 +123,7 @@ describe('A groupByUserName', () => {
   it('should reject resulting promise on errors within DB promise', done => {
     groupByUserNameWithBoundErrorDb(eventsGroupedByCalendar).then(
         aUsersToEvents => {}, aError => {
-      expect(aError).toBeTruthy();
+      expect(aError instanceof Error).toBe(true);
       done();
     })
   });
@@ -221,5 +221,17 @@ describe('A getUsersForCalendarIdWithPromise', () => {
       done();
     });
   });
+
+  var getUsersForCalendarIdWithPromiseWithBoundErrorDb =
+      getUsersForCalendarIdWithPromise.bind(this,
+      db.getCalendarsWithPromiseMockError)
+
+  it('should reject promise when there\'s db error', done => {
+    getUsersForCalendarIdWithPromiseWithBoundErrorDb('A').then(aUserNames => {
+    }, aError => {
+      expect(aError instanceof Error).toBe(true);
+      done();
+    })
+  })
 
 });

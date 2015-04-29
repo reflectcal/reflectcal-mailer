@@ -16,20 +16,6 @@ import { install } from 'source-map-support';
 install();
 
 
-export var findWithPromiseMock = () => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve();
-    }, 0)
-  })
-}
-
-
-export function findWithPromiseErrorMock() {
-  return new Promise.reject();
-}
-
-
 export function getUsersForCalendarIdWithPromiseMock(aCalendarIdToUsersMap,
     aCalendarId) {
   return Promise.resolve(aCalendarIdToUsersMap.get(aCalendarId) || []);
@@ -37,10 +23,16 @@ export function getUsersForCalendarIdWithPromiseMock(aCalendarIdToUsersMap,
 
 
 export function getUsersForCalendarIdWithPromiseMockError(aCalendarId) {
-  return new Promise.reject();
+  return Promise.reject(new Error());
 }
 
 
-export function getCalendarsWithPromiseMock(aCalendarIdToCalendarMap, aCalendarId) {
+export function getCalendarsWithPromiseMock(aCalendarIdToCalendarMap,
+    aCalendarId) {
   return Promise.resolve(aCalendarIdToCalendarMap.get(aCalendarId) || []);
+}
+
+
+export function getCalendarsWithPromiseMockError(aCalendarId) {
+  return Promise.reject(new Error());
 }
