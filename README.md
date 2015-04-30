@@ -9,12 +9,17 @@ Installation and run
 1. Clone this repository locally.
 
   ```
-  mkdir reflectcal
-  cd reflectcal
-  git clone https://github.com/alexeykomov/reflectcal.git
+  mkdir reflectcal-mailer
+  cd reflectcal-mailer
+  git clone https://github.com/alexeykomov/reflectcal-mailer.git
   ```
 
-8. Go to [http://localhost:3000/](http://localhost:3000/)
+2. Start daemon.
+
+  ```
+  gulp babel
+  npm start
+  ```
 
 [jdk]: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 [python]: https://www.python.org/download/releases/2.7/
