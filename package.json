@@ -9,8 +9,8 @@
   },
   "private": false,
   "scripts": {
-    "start": "gulp babel & node js/main/app.js",
-    "test": "gulp babel & jasmine"
+    "start": "gulp babel && node js/main/app.js",
+    "test": "gulp babel && jasmine"
   },
   "keywords": [
     "daemon",

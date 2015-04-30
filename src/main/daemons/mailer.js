@@ -121,7 +121,6 @@ export var groupByUserName = (aGetUsersForCalendarIdWithPromise,
     var userNamesPromises = [];
     var eventGroups = [];
     var usersToEvents = new Map();
-    console.log('aGroupedByCalendar: ', aGroupedByCalendar);
     for (let calendarId in aGroupedByCalendar) {
       userNamesPromises.push(aGetUsersForCalendarIdWithPromise(calendarId));
       eventGroups.push(aGroupedByCalendar[calendarId]);

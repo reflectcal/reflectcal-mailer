@@ -72,14 +72,14 @@ export const log = bunyan.default.createLogger({
 });
 
 
-var credsObject = JSON.parse(fs.default.readFileSync(path.join(__dirname, '..',
-    '..', '..', 'mail-credentials.json')));
+var credsObject = JSON.parse(fs.default.readFileSync(path.default.join(
+    __dirname, '..', '..', '..', 'mail-credentials.json')));
 
 /**
  * Mail options.
  */
 export const MAIL_OPTIONS = {
-  from: 'Reflect Calendar <' + credsObject.username + '>',
+  from: credsObject.fullUsername,
   to: '',
   subject: '',
   text: '',
