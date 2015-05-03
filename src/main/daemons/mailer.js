@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015. Epam, Alex K.
+ * Copyright (c) 2015. Reflect, Alex K.
  */
 
 /**
