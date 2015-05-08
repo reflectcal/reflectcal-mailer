@@ -8,14 +8,13 @@
  */
 
 
-import * as mongo from 'mongodb';
-import * as monk from 'monk';
 import * as appConfig from './../config/appconfig';
 import { install } from 'source-map-support';
+import * as mongo from 'mongoskin';
 install();
 
 
-export const db = monk.default(appConfig.DB_SERVER + ':' + appConfig.DB_PORT +
-    '/' + appConfig.DB_NAME);
+export const db = mongo.default.db(appConfig.DB_SERVER + ':' +
+    appConfig.DB_PORT + '/' + appConfig.DB_NAME, {native_parser:true});
 
 
