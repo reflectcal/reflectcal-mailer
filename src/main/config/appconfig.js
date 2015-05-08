@@ -19,7 +19,7 @@ install();
  * Host of db.
  * @type {string}
  */
-export const DB_SERVER = 'localhost';
+export const DB_SERVER = 'mongodb://localhost';
 
 
 /**

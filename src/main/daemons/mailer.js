@@ -146,9 +146,10 @@ export var groupByUserName = (aGetUsersForCalendarIdWithPromise,
 
 
 function getCalendarsWithPromise(aCalendarId) {
-  var collection = db.get('calendars');
-  var findWithPromise = Q.default.denodeify(collection.find.bind(collection));
-  return findWithPromise({_id: aCalendarId}, {});
+  db.bind('calendars');
+  var find = db.calendars.findItems;
+  var findWithPromise = Q.default.denodeify(find.bind(db.calendars));
+  return findWithPromise({_id: aCalendarId});
 }
 
 
@@ -176,9 +177,10 @@ export function getUsersForCalendarIdWithPromise(aGetCalendarsWithPromise,
 
 export function getCloseEventsWithPromise(aLookupObject) {
   return new Promise(function(resolve, reject) {
-    var collection = db.get('events');
-    var findWithPromise = Q.default.denodeify(collection.find.bind(collection));
-    findWithPromise(aLookupObject, {}).then(resolve, reject);
+    db.bind('events');
+    var find = db.events.findItems;
+    var findWithPromise = Q.default.denodeify(find.bind(db.events));
+    findWithPromise(aLookupObject).then(resolve, reject);
   });
 }
 
