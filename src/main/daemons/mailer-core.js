@@ -47,28 +47,16 @@ function prepareMailOptions(aEventsToSend, aUserName) {
   var eventEndTime = event.end + timeZoneOffset;
 
   var message = 'Event: ' + eventName + ' starts at ' +
-      new goog.i18n.DateTimeFormat(formatStringDate).format(
-      new Date(eventStartTime)) +
-      ' ' +
-      new goog.i18n.DateTimeFormat(formatStringTime).format(
-      new Date(eventStartTime)) +
-      ' UTC time';
+      new goog.i18n.DateTimeFormat(formatStringDate + ' ' + formatStringTime).
+      format(new Date(eventStartTime)) + ' UTC time';
 
   var eventStart =
-      new goog.i18n.DateTimeFormat(formatStringDate).format(
-      new Date(eventStartTime)) +
-      ' ' +
-      new goog.i18n.DateTimeFormat(formatStringTime).format(
-      new Date(eventStartTime)) +
-      ' UTC time';
+      new goog.i18n.DateTimeFormat(formatStringDate + ' ' + formatStringTime).
+      format(new Date(eventStartTime)) + ' UTC time';
 
   var eventEnd =
-      new goog.i18n.DateTimeFormat(formatStringDate).format(
-      new Date(eventEndTime)) +
-      ' ' +
-      new goog.i18n.DateTimeFormat(formatStringTime).format(
-      new Date(eventEndTime)) +
-      ' UTC time';
+      new goog.i18n.DateTimeFormat(formatStringDate + ' ' + formatStringTime).
+      format(new Date(eventEndTime)) + ' UTC time';
 
   var otherEvents = aEventsToSend.length > 1 ? (aEventsToSend.length - 1) +
       ' other events start at the same time': '';
