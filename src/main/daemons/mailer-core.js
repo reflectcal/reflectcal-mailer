@@ -43,31 +43,31 @@ function prepareMailOptions(aEventsToSend, aUserName) {
   var eventName = event.name || '(Untitled)';
 
   var timeZoneOffset = new Date().getTimezoneOffset() * 60 * 1000;
-  var eventStart = event.start + timeZoneOffset;
-  var eventEnd = event.end + timeZoneOffset;
+  var eventStartTime = event.start + timeZoneOffset;
+  var eventEndTime = event.end + timeZoneOffset;
 
   var message = 'Event: ' + eventName + ' starts at ' +
       new goog.i18n.DateTimeFormat(formatStringDate).format(
-      new Date(eventStart)) +
+      new Date(eventStartTime)) +
       ' ' +
       new goog.i18n.DateTimeFormat(formatStringTime).format(
-      new Date(eventStart)) +
+      new Date(eventStartTime)) +
       ' UTC time';
 
   var eventStart =
       new goog.i18n.DateTimeFormat(formatStringDate).format(
-      new Date(eventStart)) +
+      new Date(eventStartTime)) +
       ' ' +
       new goog.i18n.DateTimeFormat(formatStringTime).format(
-      new Date(eventStart)) +
+      new Date(eventStartTime)) +
       ' UTC time';
 
   var eventEnd =
       new goog.i18n.DateTimeFormat(formatStringDate).format(
-      new Date(eventEnd)) +
+      new Date(eventEndTime)) +
       ' ' +
       new goog.i18n.DateTimeFormat(formatStringTime).format(
-      new Date(eventEnd)) +
+      new Date(eventEndTime)) +
       ' UTC time';
 
   var otherEvents = aEventsToSend.length > 1 ? (aEventsToSend.length - 1) +
