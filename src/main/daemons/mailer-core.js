@@ -42,25 +42,33 @@ function prepareMailOptions(aEventsToSend, aUserName) {
   var formatStringTime = goog.i18n.DateTimeSymbols.TIMEFORMATS[3];
   var eventName = event.name || '(Untitled)';
 
+  var timeZoneOffset = new Date().getTimezoneOffset() * 60 * 1000;
+  var eventStart = event.start + timeZoneOffset;
+  var eventEnd = event.end + timeZoneOffset;
+
   var message = 'Event: ' + eventName + ' starts at ' +
       new goog.i18n.DateTimeFormat(formatStringDate).format(
-      new Date(event.start)) +
+      new Date(eventStart)) +
       ' ' +
       new goog.i18n.DateTimeFormat(formatStringTime).format(
-      new Date(event.start));
+      new Date(eventStart)) +
+      ' UTC time';
 
   var eventStart =
       new goog.i18n.DateTimeFormat(formatStringDate).format(
-      new Date(event.start)) +
+      new Date(eventStart)) +
       ' ' +
       new goog.i18n.DateTimeFormat(formatStringTime).format(
-      new Date(event.start));
+      new Date(eventStart)) +
+      ' UTC time';
+
   var eventEnd =
       new goog.i18n.DateTimeFormat(formatStringDate).format(
-      new Date(event.end)) +
+      new Date(eventEnd)) +
       ' ' +
       new goog.i18n.DateTimeFormat(formatStringTime).format(
-      new Date(event.end));
+      new Date(eventEnd)) +
+      ' UTC time';
 
   var otherEvents = aEventsToSend.length > 1 ? (aEventsToSend.length - 1) +
       ' other events start at the same time': '';
