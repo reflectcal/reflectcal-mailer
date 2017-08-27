@@ -72,8 +72,7 @@ export const log = bunyan.default.createLogger({
 });
 
 
-var credsObject = JSON.parse(fs.default.readFileSync(path.default.join(
-    __dirname, '..', '..', '..', 'mail-credentials.json')));
+var credsObject = JSON.parse(process.env.CREDS_OBJECT);
 
 /**
  * Mail options.
