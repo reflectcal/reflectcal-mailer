@@ -14,7 +14,6 @@ import * as mongo from 'mongoskin';
 install();
 
 
-export const db = mongo.default.db(appConfig.DB_SERVER + ':' +
-    appConfig.DB_PORT + '/' + appConfig.DB_NAME, {native_parser:true});
+export const db = mongo.default.db(appConfig.DB_URL, {native_parser:true});
 
 

@@ -16,24 +16,17 @@ install();
 
 
 /**
- * Host of db.
- * @type {string}
- */
-export const DB_SERVER = 'mongodb://localhost';
-
-
-/**
- * Port of db.
- * @type {string}
- */
-export const DB_PORT = 27017;
-
-
-/**
  * Name of db.
  * @type {string}
  */
-export const DB_NAME = 'rflectevents';
+const DB_NAME = 'rflectevents';
+
+
+/**
+ * Host of db.
+ * @type {string}
+ */
+export const DB_URL = 'mongodb://' + process.env.DB_URL + '/' + DB_NAME;
 
 
 /**
