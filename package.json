@@ -7,8 +7,12 @@
   "directories": {
     "doc": "doc"
   },
+  "resolutions": {
+    "graceful-fs": "^4.2.11"
+  },
   "private": false,
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "start": "gulp babel && node js/main/app.js",
     "test": "gulp babel && jasmine"
   },
