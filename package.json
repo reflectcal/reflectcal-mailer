@@ -13,7 +13,7 @@
   "private": false,
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
-    "start": "gulp babel && node js/main/app.js",
+    "start": "node src/main/app.js",
     "test": "gulp babel && jasmine"
   },
   "keywords": [
